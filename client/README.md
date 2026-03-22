@@ -1,76 +1,74 @@
-# 📚 Folio — Online Bookstore
+# 📚 Folio Bookstore v2
 
-A modern, minimal, and responsive online bookstore built with **React**, **Redux Toolkit**, **TypeScript**, and **Tailwind CSS**.
-
----
-
-## ✨ Features
-
-- 🏠 **Homepage** — Hero section, category browser, bestsellers, featured banner, new arrivals, testimonials
-- 🛍️ **Shop Page** — Full catalog with sidebar filters (category, rating), search, and sort
-- 📖 **Book Detail Page** — Rich product page with related books
-- 🛒 **Cart Drawer** — Slide-in cart with quantity controls
-- ❤️ **Wishlist** — Save books for later
-- 💳 **Checkout** — Multi-step: Shipping → Payment → Review → Confirmation
-- 🏷️ **Categories Page** — Visual category grid
-- ⭐ **Bestsellers & New Arrivals** pages
-- 🌗 **Dark / Light Mode** — Warm editorial palette
-- 🔍 **Search Modal** — Live search with results
-- 📱 **Fully Responsive** — Mobile-first design
+A modern, minimal, production-grade online bookstore built with **React 18**, **Redux Toolkit (RTK Query)**, **TypeScript**, and **Tailwind CSS**.
 
 ---
 
-## 🛠️ Tech Stack
-
-| Tech | Purpose |
-|---|---|
-| React 18 | UI framework |
-| Redux Toolkit | State management (cart, wishlist, filters, UI) |
-| TypeScript | Type safety |
-| Tailwind CSS | Utility-first styling |
-| React Router v6 | Client-side routing |
-| Vite | Build tool |
-
----
-
-## 📁 Folder Structure
+## 🗂️ Folder Structure
 
 ```
 src/
 ├── components/
-│   ├── layout/
-│   │   ├── Layout.tsx        # Root layout wrapper
-│   │   ├── Navbar.tsx        # Sticky nav with cart, search, theme toggle
-│   │   ├── Footer.tsx        # Footer with newsletter
-│   │   ├── CartDrawer.tsx    # Slide-in cart
-│   │   └── SearchModal.tsx   # Search overlay
-│   └── ui/
-│       └── BookCard.tsx      # Book card (default, compact, featured)
+│   ├── authentication/      # (reserved for auth-specific UI widgets)
+│   ├── common/              # Reusable: Button, InputField, StarRating, Badge
+│   ├── navigation/          # Navbar, SearchModal
+│   └── ui/                  # BookCard
+│
+├── hoc/                     # Higher-order components
+│   ├── PrivateRoute.tsx     # Redirects unauthenticated users to /login
+│   ├── PublicRoute.tsx      # Redirects authenticated users away from login
+│   ├── ModalWrapper.tsx     # Generic portal modal
+│   └── SidePopupWrapper.tsx # Slide-in side drawer portal
+│
+├── layout/                  # App shell pieces
+│   ├── MainLayout.tsx       # Root layout (Navbar + Outlet + Footer)
+│   ├── CartDrawer.tsx       # Slide-in cart (uses SidePopupWrapper)
+│   └── Footer.tsx
+│
 ├── pages/
-│   ├── HomePage.tsx
-│   ├── ShopPage.tsx
-│   ├── BookDetailPage.tsx
-│   ├── WishlistPage.tsx
-│   ├── CheckoutPage.tsx
-│   ├── CategoriesPage.tsx
-│   ├── BestsellersPage.tsx
-│   └── NewArrivalsPage.tsx
-├── store/
-│   ├── index.ts              # Redux store
-│   └── slices/
-│       ├── cartSlice.ts
-│       ├── wishlistSlice.ts
-│       ├── filterSlice.ts
-│       └── uiSlice.ts
+│   ├── authentication/      # Login / Signup / Forgot Password
+│   │   └── LoginPage.tsx
+│   ├── public/              # No auth required
+│   │   ├── HomePage.tsx
+│   │   ├── ShopPage.tsx
+│   │   ├── BookDetailPage.tsx
+│   │   ├── CategoriesPage.tsx
+│   │   ├── BestsellersPage.tsx
+│   │   └── NewArrivalsPage.tsx
+│   └── private/             # Auth required (wrapped by PrivateRoute)
+│       ├── WishlistPage.tsx
+│       ├── CheckoutPage.tsx
+│       └── OrdersPage.tsx
+│
+├── redux/                   # State management
+│   ├── store.ts             # Configures RTK store + api middleware
+│   ├── authSlice.ts         # User auth state + token
+│   ├── cartSlice.ts         # Cart items + drawer state
+│   ├── wishlistSlice.ts     # Wishlist items
+│   ├── filterSlice.ts       # Shop filters + sort + search
+│   └── uiSlice.ts           # Theme + mobile menu + search modal
+│
+├── routes/
+│   └── Router.tsx           # All routes: public, private, auth
+│
+├── services/                # RTK Query API slices (mirrors image structure)
+│   ├── api.ts               # Base query with JWT refresh + 401 redirect
+│   ├── authApi.ts           # login, signup, logout, forgotPassword, getMe
+│   ├── booksApi.ts          # getBooks, getBookById
+│   └── ordersApi.ts         # getOrders, placeOrder
+│
 ├── hooks/
-│   └── index.ts              # Typed hooks & selectors
+│   └── index.ts             # Typed useAppDispatch/Selector + domain selectors
+│
 ├── data/
-│   └── books.ts              # Mock book data
+│   └── books.ts             # Mock book data (12 books, all categories)
+│
 ├── types/
-│   └── index.ts              # TypeScript interfaces
-├── App.tsx
-├── main.tsx
-└── index.css                 # CSS variables + Tailwind
+│   └── index.ts             # Book, CartItem, AuthState, UIState, etc.
+│
+├── assets/                  # Static assets (images, icons)
+├── index.css                # CSS variables (light/dark), Tailwind base
+└── main.tsx                 # App entry point
 ```
 
 ---
@@ -78,28 +76,31 @@ src/
 ## 🚀 Getting Started
 
 ```bash
-# 1. Install dependencies
+# 1. Install
 npm install
 
-# 2. Start dev server
+# 2. Run dev server
 npm run dev
 
-# 3. Open in browser
+# 3. Open
 # http://localhost:3000
 ```
 
-## 🎨 Design System
+## 🔑 Auth Flow
 
-- **Font**: Cormorant Garamond (display) + DM Sans (body)
-- **Theme**: Warm editorial palette — cream whites, terracotta accent
-- **Dark mode**: Deep espresso tones with warm accents
-- **Accent color**: `#c8622a` (terracotta / burnt orange)
+- `/login` is wrapped by `PublicRoute` — authenticated users are redirected to `/`
+- `/wishlist`, `/checkout`, `/orders` are wrapped by `PrivateRoute` — unauthenticated users are redirected to `/login` with `state.from` preserved
+- After login, users are sent back to the page they tried to visit
 
----
+## 🌐 Connecting to a Real Backend
 
-## 📦 Build for Production
+1. Update `baseUrl` in `src/services/api.ts` to your API URL
+2. Replace mock `setCredentials()` in `LoginPage.tsx` with `useLoginMutation()` from `authApi.ts`
+3. Replace mock orders in `OrdersPage.tsx` with `useGetOrdersQuery()` from `ordersApi.ts`
 
-```bash
-npm run build
-npm run preview
-```
+## 🎨 Design
+
+- **Font**: Playfair Display (display) + DM Sans (body)
+- **Accent**: Terracotta `#c8622a`
+- **Themes**: Warm parchment (light) + deep espresso (dark)
+- Toggle with the moon/sun icon in the navbar

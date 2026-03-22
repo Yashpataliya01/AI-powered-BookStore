@@ -76,9 +76,7 @@ def get_cart_items(db: Session):
                 "tags":book.tags
             }
         )
-        print(books_data, "this is my books data")
 
-        
     return {
         "cart_id": cart.id,
         "items": books_data,
