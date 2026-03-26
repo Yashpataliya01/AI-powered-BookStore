@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from app.schemas.auth import LoginResponse, LoginRequest
 
@@ -22,7 +22,7 @@ def user_delete(id:int, bd:Session = Depends(get_db)):
     return delete_user(bd, id)
 
 @router.post("/login", response_model=LoginResponse)
-def user_login(body:LoginRequest, db:Session = Depends(get_db)):
+def user_login(body:LoginRequest, response: Response, db:Session = Depends(get_db)):
     user = get_user_by_email(db, body.email)
 
     if not user:
@@ -35,9 +35,8 @@ def user_login(body:LoginRequest, db:Session = Depends(get_db)):
         "user_id": user.id,
         "email": user.email
     })
-
+    
+    response.set_cookie(key="access_token", value=token, httponly=True)
     return{
-        "access_token": token,
-        "token_type": "bearer",
         "user": user
     }

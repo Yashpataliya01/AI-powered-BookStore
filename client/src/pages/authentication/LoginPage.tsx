@@ -5,6 +5,8 @@ import InputField from '@/components/common/InputField';
 import Button from '@/components/common/Button';
 import { useAppDispatch } from '@/hooks';
 import { setCredentials } from '@/redux/authSlice';
+import { useLoginMutation } from '@/services/authApi';
+
 
 type Mode = 'login' | 'signup' | 'forgot';
 
@@ -40,6 +42,8 @@ const LoginPage: React.FC = () => {
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [login] = useLoginMutation();
 
   // Rotate quotes every 5 s
   useEffect(() => {
@@ -87,18 +91,25 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    // Simulate API call — replace with real authApi mutations
-    setTimeout(() => {
-      setLoading(false);
-      if (mode !== 'forgot') {
-        dispatch(setCredentials({
-          user:  { id: '1', name: form.name || 'Reader', email: form.email },
-          token: 'mock-jwt-token',
-        }));
-      }
-      setSuccess(true);
-      setTimeout(() => navigate(mode === 'forgot' ? '/login' : from, { replace: true }), 1500);
-    }, 1800);
+    if (mode === 'login') {
+      login({ email: form.email, password: form.password }).unwrap()
+        .then(res => {
+          dispatch(setCredentials({ user: res.user }));
+          localStorage.setItem('user', JSON.stringify(res.user));
+          setSuccess(true);
+          setTimeout(() => navigate(from, { replace: true }), 1500);
+        })
+        .catch(err => {
+          setErrors({ email: err.data?.message || 'Login failed' });
+          setLoading(false);
+        });
+    } else {
+      // Simulate success for signup and forgot modes
+      setTimeout(() => {
+        setSuccess(true);
+        setLoading(false);
+      }, 1000);
+    }
   };
 
   const switchMode = (m: Mode) => { setMode(m); setErrors({}); setForm({ name:'', email:'', password:'', confirmPassword:'' }); };
@@ -108,6 +119,7 @@ const LoginPage: React.FC = () => {
     signup: { heading: 'Join Folio.',    sub: 'Create your account in seconds.', btn: 'Create Account'   },
     forgot: { heading: 'Reset password.',sub: "We'll email you a reset link.",   btn: 'Send Reset Link'  },
   };
+
   const { heading, sub, btn } = labels[mode];
   const q = QUOTES[quoteIdx];
 

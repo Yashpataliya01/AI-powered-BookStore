@@ -7,6 +7,7 @@ export interface Book {
   price: number;
   originalPrice?: number;
   cover: string;
+  image_url: string;
   category: string;
   rating: number;
   reviewCount: number;
@@ -38,9 +39,8 @@ export interface UIState       { theme: 'light' | 'dark'; mobileMenuOpen: boolea
 
 export interface User {
   id:    string;
-  name:  string;
+  username:  string;
   email: string;
-  avatar?: string;
 }
 
 export interface AuthState {

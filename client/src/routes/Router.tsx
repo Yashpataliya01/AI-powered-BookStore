@@ -13,7 +13,7 @@ import PublicRoute  from '@/hoc/PublicRoute';
 import LoginPage    from '@/pages/authentication/LoginPage';
 
 // Public pages
-import HomePage       from '@/pages/public/HomePage';
+import HomePage       from '@/pages/public/home/HomePage';
 import ShopPage       from '@/pages/public/ShopPage';
 import BookDetailPage from '@/pages/public/BookDetailPage';
 import CategoriesPage from '@/pages/public/CategoriesPage';
@@ -25,7 +25,8 @@ import WishlistPage  from '@/pages/private/WishlistPage';
 import CheckoutPage  from '@/pages/private/CheckoutPage';
 import OrdersPage    from '@/pages/private/OrdersPage';
 
-const Router: React.FC = () => (
+const Router: React.FC = () => {
+  return (
   <BrowserRouter>
     <Routes>
 
@@ -58,6 +59,6 @@ const Router: React.FC = () => (
 
     </Routes>
   </BrowserRouter>
-);
+)};
 
 export default Router;

@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -39,3 +40,11 @@ class BookResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class BookListResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    data: List[BookResponse]

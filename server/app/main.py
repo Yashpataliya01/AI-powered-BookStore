@@ -6,6 +6,7 @@ from app.api.v1.endpoints.user import router as user_router
 from app.api.v1.endpoints.book import router as book_router
 from app.api.v1.endpoints.bulk import router as bulk_router
 from app.api.v1.endpoints.cart import router as cart_router
+from app.api.v1.endpoints.wishlist import router as wishlist_router
 
 app = FastAPI(
     title="Online Book Store API",
@@ -30,6 +31,7 @@ app.include_router(user_router, prefix=prefix)
 app.include_router(book_router, prefix=prefix)
 app.include_router(bulk_router, prefix=prefix)
 app.include_router(cart_router, prefix=prefix)
+app.include_router(wishlist_router, prefix=prefix)
 
 @app.get("/")
 def read_root():
